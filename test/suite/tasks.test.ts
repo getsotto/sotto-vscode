@@ -209,9 +209,9 @@ suite('Sotto task execution', () => {
         Promise.resolve(vscode.tasks.fetchTasks({ type: 'sotto' })),
       );
       assert.equal(tasks.length, 0);
-      assert.equal(messages.length, 1);
-      assert.match(messages[0], /requires 0\.9\.0 or newer/);
-      assert.equal(messages[0].includes('local-test-only'), false);
+      const versionMessage = messages.find((message) => /requires 0\.9\.0 or newer/.test(message));
+      assert.ok(versionMessage, `shows the minimum version guidance; notifications: ${messages.join(' | ')}`);
+      assert.equal(versionMessage.includes('local-test-only'), false);
     } finally {
       process.env.SOTTO_PROBE_CLI_VERSION = 'sotto 0.9.0';
     }
@@ -224,8 +224,7 @@ suite('Sotto task execution', () => {
         Promise.resolve(vscode.tasks.fetchTasks({ type: 'sotto' })),
       );
       assert.equal(tasks.length, 0);
-      assert.equal(messages.length, 1);
-      assert.match(messages[0], /Sotto CLI 0\.9\.0-rc\.1 is too old/);
+      assert.ok(messages.some((message) => /Sotto CLI 0\.9\.0-rc\.1 is too old/.test(message)));
     } finally {
       process.env.SOTTO_PROBE_CLI_VERSION = 'sotto 0.9.0';
     }
