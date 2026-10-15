@@ -14,7 +14,7 @@ npm run compile
 npm run package
 ```
 
-The production task provider resolves user-authored tasks. The files under `spike/` and `scripts/` are test fixtures for process and terminal behavior; they are excluded from the packaged extension.
+The production task provider resolves user-authored tasks. The files under `spike/` and `scripts/` are test fixtures for process and terminal behaviour; they are excluded from the packaged extension.
 
 ## Commit sign-off
 
