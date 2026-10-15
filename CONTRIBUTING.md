@@ -14,7 +14,7 @@ npm run compile
 npm run package
 ```
 
-The project is still being scaffolded. There is no supported extension workflow yet.
+The task provider is currently a feasibility spike, not a supported product workflow. Its manual test tasks and current verification limits are documented in [`spike/README.md`](spike/README.md) and [`spike/RESULTS.md`](spike/RESULTS.md).
 
 ## Commit sign-off
 
