@@ -1,0 +1,16 @@
+.git/**
+.github/**
+.vscode/**
+.gitignore
+.nvmrc
+src/**
+node_modules/**
+package-lock.json
+esbuild.mjs
+eslint.config.mjs
+tsconfig.json
+*.vsix
+!dist/**
+!README.md
+!LICENSE
+!CHANGELOG.md
