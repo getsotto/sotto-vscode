@@ -7,7 +7,7 @@ const options = {
   format: 'cjs',
   platform: 'node',
   target: 'node18',
-  external: ['vscode'],
+  external: ['vscode', 'jsonc-parser'],
   outfile: 'dist/extension.js',
   sourcemap: true,
 };
