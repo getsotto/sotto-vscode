@@ -21,7 +21,7 @@ The extension is not yet published to the Visual Studio Marketplace. Until the f
 
 1. Install Node.js 22 and clone this repository.
 2. From the repository directory, run `npm ci` and `npm run package`.
-3. In VS Code, run **Extensions: Install from VSIX...** and select `sotto-vscode-0.0.1.vsix`.
+3. In VS Code, run **Extensions: Install from VSIX...** and select `sotto-vscode-0.1.0.vsix`.
 
 Install the Sotto CLI separately using its [installation instructions](https://github.com/getsotto/sotto#install). After the extension is published, search the Marketplace for **Sotto** by **getsotto**.
 

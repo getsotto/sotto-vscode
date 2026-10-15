@@ -1,9 +1,10 @@
 {
   "name": "sotto-vscode",
   "displayName": "Sotto",
-  "description": "Sotto integration for Visual Studio Code.",
-  "version": "0.0.1",
+  "description": "Run workspace tasks with secrets injected by the Sotto CLI.",
+  "version": "0.1.0",
   "publisher": "getsotto",
+  "preview": true,
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -90,7 +91,7 @@
     "check-types": "tsc --noEmit",
     "compile-tests": "tsc -p tsconfig.test.json",
     "test": "npm run compile && npm run compile-tests && node dist-test/test/runTest.js",
-    "package": "vsce package"
+    "package": "vsce package && node scripts/verify-vsix.mjs"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

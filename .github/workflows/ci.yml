@@ -19,3 +19,9 @@ jobs:
       - run: npm run check-types
       - run: npm run compile
       - run: npm run package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sotto-vscode-${{ github.sha }}
+          path: '*.vsix'
+          if-no-files-found: error
+          retention-days: 14
