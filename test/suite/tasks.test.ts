@@ -53,6 +53,10 @@ suite('Sotto task execution', () => {
     assert.equal(names.includes(labels.invalid), false);
     assert.equal(names.includes(labels.invalidEnvironment), false);
     assert.equal(names.includes(labels.parentProject), false);
+    assert.ok(
+      names.includes(labels.output),
+      `valid task resolves with the configured CLI; notifications: ${messages.join(' | ')}`,
+    );
   });
 
   test('blocks task resolution in untrusted and non-local workspaces', () => {
