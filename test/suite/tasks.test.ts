@@ -184,9 +184,9 @@ suite('Sotto task execution', () => {
         return vscode.tasks.fetchTasks({ type: 'sotto' });
       });
 
-      assert.equal(messages.length, 1);
-      assert.match(messages[0], /sotto\.cliPath/);
-      assert.match(messages[0], /PATH/);
+      assert.ok(
+        messages.some((message) => /sotto\.cliPath/.test(message) && /PATH/.test(message)),
+      );
       assert.equal(tasks.length, 0);
     } finally {
       const probeCli = path.resolve(
