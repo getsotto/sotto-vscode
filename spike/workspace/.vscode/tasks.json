@@ -12,6 +12,7 @@
         "quote ' and shell ; characters"
       ],
       "environment": "spike",
+      "cliPath": "task-controlled-path-must-be-ignored",
       "problemMatcher": []
     },
     {

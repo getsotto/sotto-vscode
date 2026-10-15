@@ -14,6 +14,7 @@ if (mode === 'output') {
       JSON.stringify({
         args,
         dataDirectory: process.env.SOTTO_DATA_DIR,
+        cwd: process.cwd(),
         environment: process.env.SOTTO_PROBE_ENVIRONMENT,
         sentinelPresent: hasProbeValue,
       }),

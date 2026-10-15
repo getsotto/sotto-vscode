@@ -14,7 +14,7 @@ npm run compile
 npm run package
 ```
 
-The task provider is currently a feasibility spike, not a supported product workflow. Its manual test tasks and current verification limits are documented in [`spike/README.md`](spike/README.md) and [`spike/RESULTS.md`](spike/RESULTS.md).
+The production task provider resolves user-authored tasks. The files under `spike/` and `scripts/` are test fixtures for process and terminal behavior; they are excluded from the packaged extension.
 
 ## Commit sign-off
 

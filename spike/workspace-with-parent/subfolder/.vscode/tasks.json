@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Sotto PR3: parent project must not be used",
+      "type": "sotto",
+      "command": "node",
+      "args": ["${workspaceFolder}/../../../scripts/task-probe-child.mjs", "output"],
+      "problemMatcher": []
+    }
+  ]
+}

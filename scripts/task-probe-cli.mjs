@@ -4,6 +4,11 @@ import { spawn } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 
 const args = process.argv.slice(2);
+if (args.length === 1 && args[0] === '--version') {
+  process.stdout.write(`${process.env.SOTTO_PROBE_CLI_VERSION ?? 'sotto 0.9.0'}\n`);
+  process.exit(0);
+}
+
 let environment;
 if (args[0] === '--env') {
   environment = args[1];

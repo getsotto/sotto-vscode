@@ -8,8 +8,9 @@ This record separates automated process-boundary checks from real Sotto CLI and 
 - CLI in automated task tests: `scripts/task-probe-cli.mjs`, selected via the machine-scoped `sotto.cliPath` setting. It is not Sotto.
 - Automated VS Code extension-host tests: 4 passed. They exercised argument boundaries, stdout/stderr, child environment, raw-mode task-terminal input, exit code 17, and task cancellation.
 - Real CLI build: Sotto 0.9.0 built from the local Sotto checkout. A direct invocation from the fixture with a fresh `SOTTO_DATA_DIR` and empty stdin returned the expected no-identity error (exit 4).
-- Real CLI from VS Code task: not verified. An earlier attempt did not complete within 30 seconds; it was stopped before input or credentials were supplied. The installed user CLI was not used after its data-directory isolation behaviour proved unclear.
-- Actual Sotto unlock prompt, visible terminal echo behaviour, and restricted-workspace runtime behaviour: not verified.
+- Real CLI from VS Code task: passed an optional macOS integration test against the local Sotto 0.9.0 build with a fresh `SOTTO_DATA_DIR`. The task's version preflight passed; `sotto run -- ...` reached the CLI and returned the expected no-identity exit status 4 before keychain access. No identity or password was configured.
+- Actual Sotto unlock prompt and visible terminal echo behaviour: not verified.
+- The manifest's untrusted-workspace setting and resolver trust policy have automated coverage. A live Restricted Mode host check remains unverified because `@vscode/test-electron` launches with `--disable-workspace-trust`.
 - The declared minimum VS Code version (`^1.85.0`) was not tested; the extension test host used 1.142.0.
 
 ## Windows and Linux
