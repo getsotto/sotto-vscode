@@ -4,7 +4,13 @@ This repository contains the Sotto extension for desktop Visual Studio Code. It 
 
 The extension delegates credential handling to the CLI and does not bundle it. Set the machine-scoped `sotto.cliPath` setting if the CLI is not on the PATH inherited by desktop VS Code.
 
-Add a task to `.vscode/tasks.json`:
+## Add a task
+
+In a trusted workspace, run **Sotto: Add Task** from the Command Palette. In a multi-root window, choose the workspace folder first. Enter a label and executable, then add arguments one at a time so spaces stay within the argument you entered. Choose the project default environment or set a fixed one. The extension writes `.vscode/tasks.json` and opens it for review. Reusing a Sotto task label updates that task; a label already used by a different task is left alone.
+
+The wizard warns before it stores task values in workspace configuration. Do not enter secrets in task labels, commands, arguments, or environment names. Task fields are visible to collaborators and to tools that read the workspace.
+
+You can also add a task to `.vscode/tasks.json` by hand:
 
 ```json
 {

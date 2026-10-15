@@ -2,7 +2,8 @@ import * as vscodeApi from 'vscode';
 import { execFile } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import * as path from 'node:path';
-import { taskContextProblem } from './task-policy';
+import { addSottoTask } from './add-task';
+import { taskAuthoringProblem, taskContextProblem } from './task-policy';
 
 interface SottoTaskDefinition extends vscodeApi.TaskDefinition {
   command?: unknown;
@@ -14,6 +15,14 @@ const reportedProblems = new Map<string, number>();
 
 export function activate(context: vscodeApi.ExtensionContext): void {
   context.subscriptions.push(
+    vscodeApi.commands.registerCommand('sotto.addTask', async () => {
+      const problem = taskAuthoringProblem(vscodeApi.workspace.isTrusted);
+      if (problem) {
+        void vscodeApi.window.showErrorMessage(problem);
+        return;
+      }
+      await addSottoTask();
+    }),
     vscodeApi.tasks.registerTaskProvider('sotto', {
       provideTasks: () => [],
       resolveTask: (task) => resolveSottoTask(task),
