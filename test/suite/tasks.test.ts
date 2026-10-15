@@ -330,7 +330,7 @@ suite('Sotto task execution', () => {
       assert.deepEqual(configuration.tasks[1].args, ['run checks with spaces']);
       assert.equal('environment' in configuration.tasks[1], false);
       assert.ok(information.some((message) => message.startsWith('Added Sotto task')));
-      assert.equal(vscode.window.activeTextEditor?.document.uri.fsPath, tasksPath);
+      assert.equal(pathsMatch(vscode.window.activeTextEditor?.document.uri.fsPath ?? '', tasksPath), true);
 
       await runAddTaskCommand({
         folderPath: root,
@@ -434,7 +434,9 @@ async function runAddTaskCommand(options: TaskAuthoringUiOptions): Promise<void>
   windowApi.showQuickPick = async (items, quickPickOptions) => {
     const placeholder = quickPickOptions?.placeHolder ?? '';
     if (placeholder.startsWith('Choose the workspace folder')) {
-      return items.find((item) => item.description === options.folderPath);
+      return items.find((item) =>
+        item.description !== undefined && pathsMatch(item.description, options.folderPath),
+      );
     }
     if (placeholder.startsWith('Add arguments')) {
       if (argumentsAdded < options.argumentCount) {
@@ -469,6 +471,14 @@ async function runAddTaskCommand(options: TaskAuthoringUiOptions): Promise<void>
     windowApi.showInformationMessage = original.showInformationMessage;
     windowApi.showErrorMessage = original.showErrorMessage;
   }
+}
+
+function pathsMatch(left: string, right: string): boolean {
+  const normalise = (value: string): string => {
+    const resolved = path.resolve(value);
+    return process.platform === 'win32' ? resolved.toLowerCase() : resolved;
+  };
+  return normalise(left) === normalise(right);
 }
 
 function waitForEnd(label: string): Promise<number | undefined> {
