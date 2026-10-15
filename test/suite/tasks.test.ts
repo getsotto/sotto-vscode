@@ -189,7 +189,11 @@ suite('Sotto task execution', () => {
       assert.match(messages[0], /PATH/);
       assert.equal(tasks.length, 0);
     } finally {
-      const probeCli = path.resolve(extension.extensionPath, 'scripts', 'task-probe-cli.mjs');
+      const probeCli = path.resolve(
+        extension.extensionPath,
+        'scripts',
+        process.platform === 'win32' ? 'task-probe-cli.cmd' : 'task-probe-cli.mjs',
+      );
       await vscode.workspace.getConfiguration('sotto').update(
         'cliPath',
         probeCli,
