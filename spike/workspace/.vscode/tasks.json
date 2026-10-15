@@ -1,0 +1,39 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Sotto Spike: output and argument boundaries",
+      "type": "sotto",
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/../../scripts/task-probe-child.mjs",
+        "output",
+        "argument with spaces",
+        "quote ' and shell ; characters"
+      ],
+      "environment": "spike",
+      "problemMatcher": []
+    },
+    {
+      "label": "Sotto Spike: task-terminal input",
+      "type": "sotto",
+      "command": "node",
+      "args": ["${workspaceFolder}/../../scripts/task-probe-child.mjs", "prompt"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Sotto Spike: exit status",
+      "type": "sotto",
+      "command": "node",
+      "args": ["${workspaceFolder}/../../scripts/task-probe-child.mjs", "exit"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Sotto Spike: cancellation",
+      "type": "sotto",
+      "command": "node",
+      "args": ["${workspaceFolder}/../../scripts/task-probe-child.mjs", "wait"],
+      "problemMatcher": []
+    }
+  ]
+}

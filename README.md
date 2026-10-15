@@ -1,8 +1,8 @@
 # Sotto for Visual Studio Code
 
-This repository contains the Sotto extension for desktop Visual Studio Code. The extension is under development; it does not yet add or run Sotto tasks. The `engines.vscode` minimum in `package.json` is provisional until the task execution prototype is tested.
+This repository contains the Sotto extension for desktop Visual Studio Code. The current task provider is an execution spike: it resolves manually configured `sotto` tasks and runs them through the separately installed Sotto CLI. The provider is disabled in untrusted workspaces.
 
-The planned first release will connect VS Code tasks to a separately installed Sotto CLI. The extension is intended to delegate credential handling to the CLI and not bundle it; these boundaries will be verified as the extension is implemented.
+The extension delegates credential handling to the CLI and does not bundle it. The task contract and the limits of the current verification are recorded in [`spike/README.md`](spike/README.md) and [`spike/RESULTS.md`](spike/RESULTS.md). This spike does not establish full product readiness or verify the real Sotto unlock prompt.
 
 ## Development
 
