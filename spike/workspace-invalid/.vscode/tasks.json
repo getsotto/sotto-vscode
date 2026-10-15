@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Sotto PR3: invalid task definition",
+      "type": "sotto",
+      "command": " ",
+      "problemMatcher": []
+    },
+    {
+      "label": "Sotto PR3: blank environment",
+      "type": "sotto",
+      "command": "node",
+      "args": ["${workspaceFolder}/../../scripts/task-probe-child.mjs", "output"],
+      "environment": " ",
+      "problemMatcher": []
+    }
+  ]
+}

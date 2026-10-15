@@ -1,0 +1,3 @@
+project_id = "33333333-3333-3333-3333-333333333333"
+project = "vscode-task-probe-invalid"
+environment = "test"

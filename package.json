@@ -61,7 +61,7 @@
           "type": "string",
           "default": "",
           "scope": "machine",
-          "description": "Optional path to the Sotto CLI. Defaults to resolving sotto from PATH."
+          "description": "Optional absolute path to Sotto CLI 0.9.0 or newer. Defaults to resolving sotto from VS Code's PATH."
         }
       }
     }

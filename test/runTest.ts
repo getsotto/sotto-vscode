@@ -13,20 +13,25 @@ async function main(): Promise<void> {
   const cliData = path.join(testDataRoot, 'cli-data');
   const userData = path.join(testDataRoot, 'user-data');
   const extensionsDir = path.join(testDataRoot, 'extensions');
+  const extensionRoot = path.resolve(__dirname, '../..');
   const testEnvironment = {
     SOTTO_DATA_DIR: cliData,
     SOTTO_PROBE_MARKER_ROOT: markerRoot,
     SOTTO_PROBE_RESULT: path.join(markerRoot, 'output.json'),
     SOTTO_PROBE_PROMPT_MARKER: path.join(markerRoot, 'prompt-ready'),
+    SOTTO_PROBE_CLI_VERSION: 'sotto 0.9.0',
+    ...(process.env.SOTTO_REAL_CLI_PATH
+      ? { SOTTO_REAL_CLI_PATH: process.env.SOTTO_REAL_CLI_PATH }
+      : {}),
   };
   Object.assign(process.env, testEnvironment);
 
   try {
     const code = await runTests({
-      extensionDevelopmentPath: path.resolve(__dirname, '../..'),
+      extensionDevelopmentPath: extensionRoot,
       extensionTestsPath: path.resolve(__dirname, 'suite/index.js'),
       launchArgs: [
-        `--folder-uri=${pathToFileURL(path.resolve(__dirname, '../../spike/workspace')).toString()}`,
+        `--file-uri=${pathToFileURL(path.join(extensionRoot, 'spike/task-test.code-workspace')).toString()}`,
         '--disable-gpu',
         `--user-data-dir=${userData}`,
         `--extensions-dir=${extensionsDir}`,

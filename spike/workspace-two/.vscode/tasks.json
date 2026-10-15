@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Sotto PR3: second workspace folder",
+      "type": "sotto",
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/../../scripts/task-probe-child.mjs",
+        "output",
+        "folder-scope"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

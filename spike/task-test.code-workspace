@@ -1,0 +1,8 @@
+{
+  "folders": [
+    { "path": "workspace" },
+    { "path": "workspace-two" },
+    { "path": "workspace-invalid" },
+    { "path": "workspace-with-parent/subfolder" }
+  ]
+}

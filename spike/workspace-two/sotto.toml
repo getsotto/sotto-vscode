@@ -1,0 +1,3 @@
+project_id = "22222222-2222-2222-2222-222222222222"
+project = "vscode-task-probe-second-folder"
+environment = "test"

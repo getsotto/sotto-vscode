@@ -1,4 +1,4 @@
-name: Task execution spike
+name: Sotto task execution
 
 on:
   pull_request:
