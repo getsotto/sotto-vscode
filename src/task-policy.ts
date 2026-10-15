@@ -2,6 +2,10 @@ export interface TaskFolderUri {
   scheme: string;
 }
 
+export function taskAuthoringProblem(workspaceTrusted: boolean): string | undefined {
+  return workspaceTrusted ? undefined : 'Trust this workspace before adding a Sotto task.';
+}
+
 export function taskContextProblem(
   workspaceTrusted: boolean,
   folderUri: TaskFolderUri | undefined,

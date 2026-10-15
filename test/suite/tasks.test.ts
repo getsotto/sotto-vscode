@@ -1,8 +1,9 @@
 import * as assert from 'node:assert/strict';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { parse } from 'jsonc-parser';
 import * as vscode from 'vscode';
-import { taskContextProblem } from '../../src/task-policy';
+import { taskAuthoringProblem, taskContextProblem } from '../../src/task-policy';
 
 const extensionId = 'getsotto.sotto-vscode';
 const labels = {
@@ -64,11 +65,40 @@ suite('Sotto task execution', () => {
       fs.readFileSync(path.join(extensionPath(), 'package.json'), 'utf8'),
     ) as {
       capabilities: { untrustedWorkspaces: { supported: boolean } };
-      contributes: { configuration: { properties: { 'sotto.cliPath': { scope: string } } } };
+      contributes: {
+        commands: Array<{
+          command: string;
+          title?: string;
+          category?: string;
+          enablement: string;
+        }>;
+        configuration: { properties: { 'sotto.cliPath': { scope: string } } };
+        menus: { commandPalette: Array<{ command: string; when: string }> };
+      };
     };
 
     assert.equal(manifest.capabilities.untrustedWorkspaces.supported, false);
     assert.equal(manifest.contributes.configuration.properties['sotto.cliPath'].scope, 'machine');
+    assert.equal(taskAuthoringProblem(false), 'Trust this workspace before adding a Sotto task.');
+    assert.equal(taskAuthoringProblem(true), undefined);
+    assert.deepEqual(
+      {
+        command: manifest.contributes.commands[0].command,
+        title: manifest.contributes.commands[0].title,
+        category: manifest.contributes.commands[0].category,
+        enablement: manifest.contributes.commands[0].enablement,
+      },
+      {
+        command: 'sotto.addTask',
+        title: 'Add Task',
+        category: 'Sotto',
+        enablement: 'isWorkspaceTrusted',
+      },
+    );
+    assert.deepEqual(manifest.contributes.menus.commandPalette[0], {
+      command: 'sotto.addTask',
+      when: 'isWorkspaceTrusted',
+    });
     assert.match(taskContextProblem(false, { scheme: 'file' }) ?? '', /Trust this workspace/);
     assert.equal(taskContextProblem(true, { scheme: 'file' }), undefined);
     assert.match(taskContextProblem(true, { scheme: 'vscode-remote' }) ?? '', /local desktop/);
@@ -251,6 +281,107 @@ suite('Sotto task execution', () => {
     await ended;
   });
 
+  test('adds a task to the chosen folder while preserving edits made during prompts', async () => {
+    const root = path.join(extensionPath(), 'spike', 'workspace-two');
+    const tasksPath = path.join(root, '.vscode', 'tasks.json');
+    const originalTasks = fs.readFileSync(tasksPath, 'utf8');
+
+    try {
+      const information: string[] = [];
+      await runAddTaskCommand({
+        folderPath: root,
+        values: ['Run checks', 'npm', 'run checks with spaces'],
+        argumentCount: 1,
+        beforeEnvironmentChoice: async () => {
+          const userDocument = await vscode.workspace.openTextDocument(vscode.Uri.file(tasksPath));
+          const userEditor = await vscode.window.showTextDocument(userDocument);
+          const concurrentEdit = [
+            '{',
+            '  // Added while the prompts were open.',
+            '  "version": "2.1.0",',
+            '  "tasks": [{"label":"Keep this task","type":"shell","command":"echo keep"}]',
+            '}',
+            '',
+          ].join('\n');
+          const applied = await userEditor.edit((builder) => {
+            builder.replace(
+              new vscode.Range(userDocument.positionAt(0), userDocument.positionAt(userDocument.getText().length)),
+              concurrentEdit,
+            );
+          });
+          assert.equal(applied, true);
+          assert.equal(await userDocument.save(), true);
+        },
+        information,
+      });
+
+      const document = fs.readFileSync(tasksPath, 'utf8');
+      const configuration = parse(document) as {
+        version: string;
+        tasks: Array<Record<string, unknown>>;
+      };
+      assert.match(document, /Added while the prompts were open/);
+      assert.equal(configuration.version, '2.1.0');
+      assert.equal(configuration.tasks.length, 2);
+      assert.equal(configuration.tasks[0].label, 'Keep this task');
+      assert.equal(configuration.tasks[1].label, 'Run checks');
+      assert.equal(configuration.tasks[1].type, 'sotto');
+      assert.equal(configuration.tasks[1].command, 'npm');
+      assert.deepEqual(configuration.tasks[1].args, ['run checks with spaces']);
+      assert.equal('environment' in configuration.tasks[1], false);
+      assert.ok(information.some((message) => message.startsWith('Added Sotto task')));
+      assert.equal(pathsMatch(vscode.window.activeTextEditor?.document.uri.fsPath ?? '', tasksPath), true);
+
+      await runAddTaskCommand({
+        folderPath: root,
+        values: ['Run checks', 'pnpm', 'staging'],
+        argumentCount: 0,
+        environment: 'staging',
+        information,
+      });
+
+      const updatedDocument = fs.readFileSync(tasksPath, 'utf8');
+      const updatedConfiguration = parse(updatedDocument) as {
+        tasks: Array<Record<string, unknown>>;
+      };
+      assert.equal(updatedConfiguration.tasks.length, 2);
+      assert.equal(updatedConfiguration.tasks[1].command, 'pnpm');
+      assert.deepEqual(updatedConfiguration.tasks[1].args, []);
+      assert.equal(updatedConfiguration.tasks[1].environment, 'staging');
+      assert.ok(information.some((message) => message.startsWith('Updated Sotto task')));
+
+      await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+      const malformed = '{ "tasks": [ ';
+      const errors: string[] = [];
+      await runAddTaskCommand({
+        folderPath: root,
+        values: ['Run checks', 'npm'],
+        argumentCount: 0,
+        errors,
+        beforeEnvironmentChoice: async () => {
+          const userDocument = await vscode.workspace.openTextDocument(vscode.Uri.file(tasksPath));
+          const userEditor = await vscode.window.showTextDocument(userDocument);
+          const applied = await userEditor.edit((builder) => {
+            builder.replace(
+              new vscode.Range(userDocument.positionAt(0), userDocument.positionAt(userDocument.getText().length)),
+              malformed,
+            );
+          });
+          assert.equal(applied, true);
+          assert.equal(await userDocument.save(), true);
+        },
+      });
+      assert.equal(fs.readFileSync(tasksPath, 'utf8'), malformed);
+      assert.ok(
+        errors.some((message) => /malformed and was left unchanged/.test(message)),
+        `reports the malformed file; notifications: ${errors.join(' | ')}`,
+      );
+    } finally {
+      await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+      fs.writeFileSync(tasksPath, originalTasks);
+    }
+  });
+
 });
 
 async function findTask(label: string): Promise<vscode.Task> {
@@ -264,6 +395,90 @@ function extensionPath(): string {
   const extension = vscode.extensions.getExtension(extensionId);
   assert.ok(extension);
   return extension.extensionPath;
+}
+
+interface TaskAuthoringUiOptions {
+  folderPath: string;
+  values: string[];
+  argumentCount: number;
+  environment?: string;
+  beforeEnvironmentChoice?: () => void | Promise<void>;
+  information?: string[];
+  errors?: string[];
+}
+
+async function runAddTaskCommand(options: TaskAuthoringUiOptions): Promise<void> {
+  const windowApi = vscode.window as unknown as {
+    showWarningMessage: (...args: unknown[]) => Promise<unknown>;
+    showInputBox: (options: { prompt?: string }) => Promise<string | undefined>;
+    showQuickPick: (
+      items: readonly vscode.QuickPickItem[],
+      options?: { placeHolder?: string },
+    ) => Promise<vscode.QuickPickItem | undefined>;
+    showInformationMessage: (...args: unknown[]) => Promise<unknown>;
+    showErrorMessage: (...args: unknown[]) => Promise<unknown>;
+  };
+  const original = {
+    showWarningMessage: windowApi.showWarningMessage,
+    showInputBox: windowApi.showInputBox,
+    showQuickPick: windowApi.showQuickPick,
+    showInformationMessage: windowApi.showInformationMessage,
+    showErrorMessage: windowApi.showErrorMessage,
+  };
+  let argumentsAdded = 0;
+  const information = options.information ?? [];
+  const errors = options.errors ?? [];
+
+  windowApi.showWarningMessage = async () => 'Continue';
+  windowApi.showInputBox = async () => options.values.shift();
+  windowApi.showQuickPick = async (items, quickPickOptions) => {
+    const placeholder = quickPickOptions?.placeHolder ?? '';
+    if (placeholder.startsWith('Choose the workspace folder')) {
+      return items.find((item) =>
+        item.description !== undefined && pathsMatch(item.description, options.folderPath),
+      );
+    }
+    if (placeholder.startsWith('Add arguments')) {
+      if (argumentsAdded < options.argumentCount) {
+        argumentsAdded += 1;
+        return items.find((item) => item.label === 'Add an argument');
+      }
+      return items.find((item) => item.label === 'Finish arguments');
+    }
+    if (placeholder.startsWith('Choose the Sotto environment')) {
+      await options.beforeEnvironmentChoice?.();
+      return items.find((item) =>
+        item.label === (options.environment ? 'Set a fixed environment' : 'Use the project default'),
+      );
+    }
+    return undefined;
+  };
+  windowApi.showInformationMessage = async (message: unknown) => {
+    information.push(String(message));
+    return undefined;
+  };
+  windowApi.showErrorMessage = async (message: unknown) => {
+    errors.push(String(message));
+    return undefined;
+  };
+
+  try {
+    await vscode.commands.executeCommand('sotto.addTask');
+  } finally {
+    windowApi.showWarningMessage = original.showWarningMessage;
+    windowApi.showInputBox = original.showInputBox;
+    windowApi.showQuickPick = original.showQuickPick;
+    windowApi.showInformationMessage = original.showInformationMessage;
+    windowApi.showErrorMessage = original.showErrorMessage;
+  }
+}
+
+function pathsMatch(left: string, right: string): boolean {
+  const normalise = (value: string): string => {
+    const resolved = path.resolve(value);
+    return process.platform === 'win32' ? resolved.toLowerCase() : resolved;
+  };
+  return normalise(left) === normalise(right);
 }
 
 function waitForEnd(label: string): Promise<number | undefined> {

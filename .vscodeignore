@@ -9,7 +9,6 @@ scripts/**
 test/**
 dist-test/**
 tsconfig.test.json
-node_modules/**
 package-lock.json
 esbuild.mjs
 eslint.config.mjs
