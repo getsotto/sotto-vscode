@@ -14,7 +14,9 @@ This record separates automated process-boundary checks from real Sotto CLI and 
 
 ## Windows and Linux
 
-Pending the `desktop-task-smoke` GitHub Actions matrix and host-specific manual checks. The Windows task probe uses a `.cmd` launcher; CI is expected to reveal whether VS Code `ProcessExecution` can launch it as configured.
+The `desktop-task-smoke` GitHub Actions matrix passed on 15 October 2026 for `macos-latest`, `windows-latest`, and `ubuntu-latest`. Each job used Node.js 22 and the VS Code 1.142.0 extension test host. The Windows job also confirmed that `ProcessExecution` launches the probe through its `.cmd` shim. See the [matrix run](https://github.com/getsotto/sotto-vscode/actions/runs/38719518388).
+
+These are hosted extension-test environments running a fake CLI; they do not count as manual desktop checks or prove the real Sotto CLI's unlock flow. Windows/Linux desktop VS Code and CLI versions, GUI PATH lookup, keychain isolation, and actual prompt behavior remain unverified.
 
 ## Acceptance gaps
 
