@@ -112,7 +112,12 @@ function checkCliVersion(executable: string): Promise<string | undefined> {
     execFile(
       versionCommand.executable,
       versionCommand.args,
-      { timeout: 5_000, maxBuffer: 64 * 1024, windowsHide: true },
+      {
+        timeout: 5_000,
+        maxBuffer: 64 * 1024,
+        windowsHide: true,
+        windowsVerbatimArguments: versionCommand.windowsVerbatimArguments ?? false,
+      },
       (error, stdout) => {
         if (error) {
           resolve(
@@ -144,7 +149,7 @@ function checkCliVersion(executable: string): Promise<string | undefined> {
 
 function getVersionCommand(
   executable: string,
-): { executable: string; args: string[] } | string {
+): { executable: string; args: string[]; windowsVerbatimArguments?: boolean } | string {
   if (process.platform === 'win32' && /\.(?:cmd|bat)$/i.test(executable)) {
     if (executable.includes('%')) {
       return 'The Sotto CLI path contains `%`, which cannot be safely checked when it is a Windows command script. Set `sotto.cliPath` to the Sotto executable instead.';
@@ -152,6 +157,7 @@ function getVersionCommand(
     return {
       executable: process.env.ComSpec || 'cmd.exe',
       args: ['/d', '/s', '/c', `""${executable}" --version"`],
+      windowsVerbatimArguments: true,
     };
   }
   return { executable, args: ['--version'] };
