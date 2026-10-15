@@ -1,6 +1,6 @@
 # Task execution spike
 
-This is feasibility code for PR 2. It verifies the VS Code task process boundary before the task provider is redesigned for product use. It does not replace Sotto CLI behavior: `task-probe-cli.mjs` only simulates the CLI argument contract and injects a non-secret sentinel for terminal/process checks.
+This is feasibility code for PR 2. It verifies the VS Code task process boundary before the task provider is redesigned for product use. It does not replace Sotto CLI behaviour: `task-probe-cli.mjs` only simulates the CLI argument contract and injects a non-secret sentinel for terminal/process checks.
 
 ## Run the probe tasks
 
@@ -19,4 +19,4 @@ The exact Sotto hidden-password prompt still needs a separate test against a tem
 
 ## Record results
 
-For each OS, record the desktop VS Code version, Sotto CLI version, CLI path source, each task outcome, and any terminal input, output, cancellation, or exit-status discrepancy in `RESULTS.md`. A passing extension-host test alone does not prove this behavior.
+For each OS, record the desktop VS Code version, Sotto CLI version, CLI path source, each task outcome, and any terminal input, output, cancellation, or exit-status discrepancy in `RESULTS.md`. A passing extension-host test alone does not prove this behaviour.
