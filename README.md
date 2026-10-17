@@ -23,11 +23,24 @@ The extension is not yet published to the Visual Studio Marketplace. Until the f
 2. From the repository directory, run `npm ci` and `npm run package`.
 3. In VS Code, run **Extensions: Install from VSIX...** and select `sotto-vscode-0.1.0.vsix`.
 
-Install the Sotto CLI separately using its [installation instructions](https://github.com/getsotto/sotto#install). After the extension is published, search the Marketplace for **Sotto** by **getsotto**.
+Install the Sotto CLI separately using its [installation instructions](https://github.com/getsotto/sotto#install). The extension does not install or update the CLI for you. After the extension is published, search the Marketplace for **Sotto** by **getsotto**.
+
+### macOS Homebrew preview
+
+The [Sotto Homebrew tap](https://github.com/getsotto/homebrew-tap) offers a preview installation route for the CLI. The tap's launch-readiness checks are still outstanding, so treat this as a preview and do not use it for critical production secrets. Check the [readiness record](https://github.com/getsotto/homebrew-tap/blob/main/releases/READINESS.md) for the current launch status.
+
+The formula supports macOS 15 or later, targets Apple Silicon first, and offers best-effort Intel support. Install the CLI with:
+
+```sh
+brew install getsotto/tap/sotto
+sotto --version
+```
+
+The extension requires CLI 0.9.0 or newer. To update the Homebrew installation, run `brew update` followed by `brew upgrade getsotto/tap/sotto`. To remove only the formula, run `brew uninstall getsotto/tap/sotto`; local Sotto data and other CLI installations are separate.
 
 ## Set up and add a task
 
-1. Check that `sotto --version` reports 0.9.0 or newer. If VS Code cannot find the CLI on its `PATH`, set the absolute path in the machine-scoped `sotto.cliPath` setting. For example, add this to your user `settings.json`:
+1. Check that `sotto --version` reports 0.9.0 or newer. If VS Code cannot find the CLI on its `PATH` (common when VS Code is launched from the Dock), set the absolute path in the machine-scoped `sotto.cliPath` setting. For a Homebrew install, run `"$(brew --prefix)/bin/sotto" --version` to verify the Homebrew executable. Copy `$(brew --prefix)/bin/sotto` into the setting if needed. For example, add this to your user `settings.json`:
 
    ```json
    {
